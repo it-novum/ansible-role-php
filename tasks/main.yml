@@ -24,3 +24,9 @@
   detect_fpm_port: php_poold={{ fpm_poold }} pool_name={{ vhost_domain }}
   register: pool_info
 
+- name: Fact | FPM port
+  set_fact: php_fpm_port={{ pool_info.port }}
+
+- name: FPM Configuration
+  template: src=fpm.conf.j2 dest={{ fpm_poold }}/{{ vhost_domain }}.conf
+
