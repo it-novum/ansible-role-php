@@ -1,0 +1,77 @@
+#!/usr/bin/python
+# coding: utf-8
+from __future__ import (absolute_import, division, print_function)
+__metaclass__ = type
+
+from ansible.module_utils.basic import AnsibleModule
+
+import os
+import re
+from ConfigParser import ConfigParser, NoSectionError, NoOptionError
+
+# TODO: Documentation
+
+def get_listen_from_config(module, poold, name):
+    parser = ConfigParser()
+    try:
+        with open('{}/{}.conf'.format(poold, name)) as f:
+            parser.readfp(f)
+    except IOError as e:
+        module.fail_json(msg='Could not read configuration file: {}'.format(str(e)))
+
+    try:
+        return parser.get(name, 'listen')
+    except NoSectionError:
+        module.fail_json('The configuration file does not have a matching pool section: {}'.format(name))
+    except NoOptionError:
+        module.fail_json('The pool section does not have a listen option')
+
+def get_port(listen):
+    match = re.match(r'^\s*(?P<addr>.*):(?P<port>\d*)$', listen)
+    if match is not None:
+        return match.group('port')
+    else:
+        return None
+
+def main():
+    module = AnsibleModule(
+        argument_spec=dict(
+            php_poold={"required": True, "type": "str"},
+            pool_name={"required": True, "type": "str"},
+        )
+    )
+    php_poold = module.params['php_poold']
+    pool_name = module.params['pool_name']
+
+    generate_port = True
+    new_port = None
+
+    if os.path.exists('{}/{}.conf'.format(php_poold, pool_name)):
+        listen = get_listen_from_config(module, php_poold, pool_name)
+        port = get_port(listen)
+        if port is not None:
+            new_port = port
+            generate_port = False
+    
+    if generate_port:
+        used_ports = []
+        for pool_file in os.listdir(php_poold):
+            match = re.match(r'^(?P<pool_name>.*)(.conf)$', pool_file)
+            if match is not None:
+                pool_name = match.group('pool_name')
+                listen = get_listen_from_config(module, php_poold, pool_name)
+                port = get_port(listen)
+                if port is not None:
+                    used_ports.append(int(port))
+        for i in range(9000, 9999):
+            if i not in used_ports:
+                new_port = str(i)
+                break
+        if new_port is None:
+            module.fail_json('Could not determine a new port')
+
+    module.exit_json(changed=False, port=new_port)
+
+if __name__ == '__main__':
+    main()
+
