@@ -20,7 +20,7 @@
 - name: Fact | fpm configuration directory
   set_fact: fpm_poold=/etc/php5/fpm/pool.d/
 
-- name: Detect fpm port
+- name: Fact | Detect fpm port
   detect_fpm_port: php_poold={{ fpm_poold }} pool_name={{ vhost_domain }}
   register: pool_info
 
