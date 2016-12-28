@@ -1,0 +1,19 @@
+- name: APT | Installation
+  apt: name={{ item }}
+  with_items:
+    - php5-fpm
+    - php5-curl
+    - php5-gd
+    - php5-gmp
+    - php5-json
+    - php5-ldap
+    - php5-sqlite
+    - php5-xmlrpc
+    - php5-xsl
+    - php5-geoip
+    - php5-imap
+    - php5-intl
+    - php5-mcrypt
+    - php5-mysqlnd
+  when: ansible_pkg_mgr == "apt"
+
