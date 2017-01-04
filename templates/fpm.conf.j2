@@ -67,7 +67,7 @@ php_admin_value[max_file_uploads] = 42
 php_admin_value[upload_max_filesize] = 128M
 
 php_flag[allow_url_fopen] = on
-php_admin_value[memory_limit] = 512M
+php_admin_value[memory_limit] = {{ php_ini_memory_limit }}
 php_admin_value[post_max_size] = 128M
 php_admin_value[max_input_time] = 60
 php_admin_value[max_execution_time] = 300
