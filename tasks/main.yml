@@ -18,7 +18,19 @@
   when: ansible_pkg_mgr == "apt"
 
 - name: Fact | fpm configuration directory
-  set_fact: fpm_poold=/etc/php5/fpm/pool.d/
+  set_fact: "{{item.key}}={{item.value}}"
+  with_items:
+    - key: fpm_poold
+      value: /etc/php5/fpm/pool.d
+    - key: fpm_confd
+      value: /etc/php5/fpm/conf.d
+    - key: php_modules_d
+      value: /etc/php5/mods-available
+
+- name: Activate php modules
+  file: "state=link path=\"{{fpm_confd}}/20-{{item }}\" src=\"{{php_modules_d}}/{{ item }}\""
+  with_items:
+    - mcrypt.ini
 
 - name: Fact | Detect fpm port
   detect_fpm_port: php_poold={{ fpm_poold }} pool_name={{ vhost_domain }}
