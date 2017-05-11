@@ -1,40 +1,42 @@
-- name: APT | Installation
-  apt: name={{ item }}
-  with_items:
-    - php5-fpm
-    - php5-curl
-    - php5-gd
-    - php5-gmp
-    - php5-json
-    - php5-ldap
-    - php5-sqlite
-    - php5-xmlrpc
-    - php5-xsl
-    - php5-geoip
-    - php5-imap
-    - php5-intl
-    - php5-mcrypt
-    - php5-mysqlnd
-  when: ansible_pkg_mgr == "apt" and ansible_distribution_version != "16.04"
+- set_fact:
+    php_packages:
+      - php5-fpm
+      - php5-curl
+      - php5-gd
+      - php5-gmp
+      - php5-json
+      - php5-ldap
+      - php5-sqlite
+      - php5-xmlrpc
+      - php5-xsl
+      - php5-geoip
+      - php5-imap
+      - php5-intl
+      - php5-mcrypt
+      - php5-mysqlnd
+
+- set_fact:
+    php_packages:
+      - php7.0-fpm
+      - php7.0-curl
+      - php7.0-gd
+      - php7.0-gmp
+      - php7.0-json
+      - php7.0-ldap
+      - php7.0-sqlite3
+      - php7.0-xmlrpc
+      - php7.0-xsl
+      - php-geoip
+      - php7.0-imap
+      - php7.0-intl
+      - php7.0-mcrypt
+      - php7.0-mysqlnd  
+  when: ansible_pkg_mgr == "apt" and ansible_distribution_version == "16.04"
 
 - name: APT | Installation
   apt: name={{ item }}
-  with_items:
-    - php7.0-fpm
-    - php7.0-curl
-    - php7.0-gd
-    - php7.0-gmp
-    - php7.0-json
-    - php7.0-ldap
-    - php7.0-sqlite3
-    - php7.0-xmlrpc
-    - php7.0-xsl
-    - php-geoip
-    - php7.0-imap
-    - php7.0-intl
-    - php7.0-mcrypt
-    - php7.0-mysqlnd
-  when: ansible_pkg_mgr == "apt" and ansible_distribution_version == "16.04"
+  with_items: "{{ php_packages }}"
+  when: ansible_pkg_mgr == "apt" 
 
 - name: Fact | fpm configuration directory
   set_fact: "{{item.key}}={{item.value}}"
