@@ -14,6 +14,7 @@
       - php5-intl
       - php5-mcrypt
       - php5-mysqlnd
+  when: ansible_distribution_release == "trusty"
 
 - set_fact:
     php_packages:
@@ -31,10 +32,11 @@
       - php7.0-intl
       - php7.0-mcrypt
       - php7.0-mysqlnd  
-  when: ansible_pkg_mgr == "apt" and ansible_distribution_version == "16.04"
+  when: ansible_distribution_release != "trusty"
 
 - name: APT | Installation
-  apt: name={{ item }}
+  apt:
+    name: "{{ item }}"
   with_items: "{{ php_packages }}"
   when: ansible_pkg_mgr == "apt" 
 
@@ -47,7 +49,7 @@
       value: /etc/php5/fpm/conf.d
     - key: php_modules_d
       value: /etc/php5/mods-available
-  when: ansible_distribution_version != "16.04"
+  when: ansible_distribution_release == "trusty"
 
 - name: Fact | fpm configuration directory
   set_fact: "{{item.key}}={{item.value}}"
@@ -58,20 +60,29 @@
       value: /etc/php/7.0/fpm/conf.d
     - key: php_modules_d
       value: /etc/php/7.0/mods-available
-  when: ansible_distribution_version == "16.04"
+  when: ansible_distribution_version != "trusty"
 
 - name: Activate php modules
-  file: "state=link path=\"{{fpm_confd}}/20-{{item }}\" src=\"{{php_modules_d}}/{{ item }}\""
+  file:
+    state: link
+    path: "{{fpm_confd}}/20-{{item }}"
+    src: "{{php_modules_d}}/{{ item }}"
   with_items:
     - mcrypt.ini
+  notify: restart fpm
 
 - name: Fact | Detect fpm port
-  detect_fpm_port: php_poold={{ fpm_poold }} pool_name={{ vhost_domain }}
+  detect_fpm_port:
+    php_poold: "{{ fpm_poold }}"
+    pool_name: "{{ vhost_domain }}"
   register: pool_info
 
 - name: Fact | FPM port
-  set_fact: php_fpm_port={{ pool_info.port }}
+  set_fact:
+    php_fpm_port: "{{ pool_info.port }}"
 
 - name: FPM Configuration
-  template: src=fpm.conf.j2 dest={{ fpm_poold }}/{{ vhost_domain }}.conf
-
+  template:
+    src: "fpm.conf.j2"
+    dest: "{{ fpm_poold }}/{{ vhost_domain }}.conf"
+  notify: restart fpm

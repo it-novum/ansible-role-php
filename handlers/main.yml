@@ -1,0 +1,4 @@
+- name: restart fpm
+  service:
+    name: "{% if ansible_distribution_release != 'trusty' %}php5-fpm{% else %}php7.0-fpm{% endif %}"
+    state: restarted
