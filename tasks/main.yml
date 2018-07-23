@@ -1,20 +1,10 @@
 - set_fact:
-    php_packages:
-      - php5-fpm
-      - php5-curl
-      - php5-gd
-      - php5-gmp
-      - php5-json
-      - php5-ldap
-      - php5-sqlite
-      - php5-xmlrpc
-      - php5-xsl
-      - php5-geoip
-      - php5-imap
-      - php5-intl
-      - php5-mcrypt
-      - php5-mysqlnd
-  when: ansible_distribution_release == "trusty"
+    php_hell: "70"
+  when: ansible_distribution_release == "xenial" or ansible_distribution_release == "strech" or ansible_distribution_release == "jessie"
+
+- set_fact:
+    php_hell: "72"
+  when: ansible_distribution_release == "bionic"
 
 - set_fact:
     php_packages:
@@ -32,7 +22,26 @@
       - php7.0-intl
       - php7.0-mcrypt
       - php7.0-mysqlnd  
-  when: ansible_distribution_release != "trusty"
+      - php7.0-soap
+  when: php_hell == "70"
+
+- set_fact:
+    php_packages:
+      - php-fpm
+      - php-curl
+      - php-gd
+      - php-gmp
+      - php-json
+      - php-ldap
+      - php-sqlite3
+      - php-xmlrpc
+      - php-xml
+      - php-geoip
+      - php-imap
+      - php-intl
+      - php-mysql
+      - php-soap
+  when: php_hell == "72"
 
 - name: APT | Installation
   apt:
@@ -44,23 +53,23 @@
   set_fact: "{{item.key}}={{item.value}}"
   with_items:
     - key: fpm_poold
-      value: /etc/php5/fpm/pool.d
-    - key: fpm_confd
-      value: /etc/php5/fpm/conf.d
-    - key: php_modules_d
-      value: /etc/php5/mods-available
-  when: ansible_distribution_release == "trusty"
-
-- name: Fact | fpm configuration directory
-  set_fact: "{{item.key}}={{item.value}}"
-  with_items:
-    - key: fpm_poold
       value: /etc/php/7.0/fpm/pool.d
     - key: fpm_confd
       value: /etc/php/7.0/fpm/conf.d
     - key: php_modules_d
       value: /etc/php/7.0/mods-available
-  when: ansible_distribution_version != "trusty"
+  when: php_hell == "70"
+
+- name: Fact | fpm configuration directory
+  set_fact: "{{item.key}}={{item.value}}"
+  with_items:
+    - key: fpm_poold
+      value: /etc/php/7.2/fpm/pool.d
+    - key: fpm_confd
+      value: /etc/php/7.2/fpm/conf.d
+    - key: php_modules_d
+      value: /etc/php/7.2/mods-available
+  when: php_hell == "72"
 
 - name: Activate php modules
   file:
@@ -69,6 +78,7 @@
     src: "{{php_modules_d}}/{{ item }}"
   with_items:
     - mcrypt.ini
+  when: php_hell == "70"
   notify: restart fpm
 
 - name: Fact | Detect fpm port
