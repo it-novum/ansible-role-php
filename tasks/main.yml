@@ -23,6 +23,7 @@
       - php7.0-mcrypt
       - php7.0-mysqlnd  
       - php7.0-soap
+      - php7.0-mbstring
   when: php_hell == "70"
 
 - set_fact:
@@ -41,12 +42,12 @@
       - php-intl
       - php-mysql
       - php-soap
+      - php-mbstring
   when: php_hell == "72"
 
 - name: APT | Installation
   apt:
-    name: "{{ item }}"
-  with_items: "{{ php_packages }}"
+    name: "{{ php_packages }}"
   when: ansible_pkg_mgr == "apt" 
 
 - name: Fact | fpm configuration directory
