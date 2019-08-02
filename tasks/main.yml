@@ -1,10 +1,14 @@
 - set_fact:
     php_hell: "70"
-  when: ansible_distribution_release == "xenial" or ansible_distribution_release == "strech" or ansible_distribution_release == "jessie"
+  when: ansible_distribution_release == "xenial" or ansible_distribution_release == "strech"
 
 - set_fact:
     php_hell: "72"
   when: ansible_distribution_release == "bionic"
+
+- set_fact:
+    php_hell: "73"
+  when: ansible_distribution_release == "buster"
 
 - set_fact:
     php_packages:
@@ -43,7 +47,7 @@
       - php-mysql
       - php-soap
       - php-mbstring
-  when: php_hell == "72"
+  when: php_hell == "72" or php_hell == "73"
 
 - name: APT | Installation
   apt:
@@ -71,6 +75,17 @@
     - key: php_modules_d
       value: /etc/php/7.2/mods-available
   when: php_hell == "72"
+
+- name: Fact | fpm configuration directory
+  set_fact: "{{item.key}}={{item.value}}"
+  with_items:
+    - key: fpm_poold
+      value: /etc/php/7.3/fpm/pool.d
+    - key: fpm_confd
+      value: /etc/php/7.3/fpm/conf.d
+    - key: php_modules_d
+      value: /etc/php/7.3/mods-available
+  when: php_hell == "73"
 
 - name: Activate php modules
   file:

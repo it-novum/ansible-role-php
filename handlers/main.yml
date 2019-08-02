@@ -1,4 +1,4 @@
 - name: restart fpm
   service:
-    name: "{% if php_hell == '5' %}php5-fpm{% elif php_hell == '70' %}php7.0-fpm{% else %}php7.2-fpm{% endif %}"
+    name: "{%if php_hell == '70' %}php7.0-fpm{% elif php_hell == '72' %}php7.2-fpm{% else %}php7.3-fpm{% endif %}"
     state: restarted
