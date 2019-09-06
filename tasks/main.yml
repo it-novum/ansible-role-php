@@ -23,5 +23,5 @@
 - name: FPM Configuration
   template:
     src: "fpm.conf.j2"
-    dest: "{{ fpm_poold }}/{{ vhost_domain }}.conf"
+    dest: "{{ fpm_poold }}/{{ php_fpm_poolname }}.conf"
   notify: restart fpm
