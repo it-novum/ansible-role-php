@@ -1,12 +1,12 @@
-[{{ vhost_domain }}]
-user = {{ vhost_user }}
-group = {{ vhost_user }}
+[{{ php_fpm_poolname }}]
+user = {{ php_fpm_user }}
+group = {{ php_fpm_user }}
 
-listen = 127.0.0.1:{{ php_fpm_port }}
+listen = {{ php_fpm_socket }}
 listen.owner = www-data
 listen.group = www-data
 listen.mode = 0660
-listen.allowed_clients = 127.0.0.1
+;listen.allowed_clients = 127.0.0.1
 
 ; Specify the nice(2) priority to apply to the pool processes (only if set)
 ; The value can vary from -19 (highest priority) to 20 (lower priority)
@@ -48,13 +48,13 @@ pm.max_spare_servers = 10
 pm.process_idle_timeout = 1800s;
 pm.max_requests = 1000
 
-chdir = {{ vhost_directory }}/htdocs
+chdir = {{ php_fpm_chdir }}
 ; error logging
 catch_workers_output = yes
 
-env[TMP] = {{ vhost_directory }}/tmp
-env[TMPDIR] = {{ vhost_directory }}/tmp
-env[TEMP] = {{ vhost_directory }}/tmp
+env[TMP] = {{ php_fpm_tmpdir }}
+env[TMPDIR] = {{ php_fpm_tmpdir }}
+env[TEMP] = {{ php_fpm_tmpdir }}
 
 php_admin_flag[display_errors] = off
 php_admin_value[error_log] =
@@ -79,5 +79,5 @@ php_value[default_charset] = UTF-8
 php_value[date.timezone] = Europe/Berlin
 php_value[session.gc_maxlifetime] = 604800
 php_value[session.cookie_lifetime] = 0
-php_admin_value[open_basedir] = {{ vhost_directory }}:/tmp/:/usr/share/php/:/usr/bin/:/dev/urandom:/dev/random
+php_admin_value[open_basedir] = {{ php_fpm_chdir }}:{{ php_fpm_tmpdir }}:/tmp/:/usr/share/php/:/usr/bin/:/dev/urandom:/dev/random
 

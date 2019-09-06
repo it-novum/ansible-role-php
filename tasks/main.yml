@@ -1,111 +1,24 @@
-- set_fact:
-    php_hell: "70"
-  when: ansible_distribution_release == "xenial" or ansible_distribution_release == "strech"
+- name: facts
+  include_tasks: facts.yml
 
-- set_fact:
-    php_hell: "72"
-  when: ansible_distribution_release == "bionic"
-
-- set_fact:
-    php_hell: "73"
-  when: ansible_distribution_release == "buster"
-
-- set_fact:
-    php_packages:
-      - php7.0-fpm
-      - php7.0-curl
-      - php7.0-gd
-      - php7.0-gmp
-      - php7.0-json
-      - php7.0-ldap
-      - php7.0-sqlite3
-      - php7.0-xmlrpc
-      - php7.0-xsl
-      - php-geoip
-      - php7.0-imap
-      - php7.0-intl
-      - php7.0-mcrypt
-      - php7.0-mysqlnd  
-      - php7.0-soap
-      - php7.0-mbstring
-  when: php_hell == "70"
-
-- set_fact:
-    php_packages:
-      - php-fpm
-      - php-curl
-      - php-gd
-      - php-gmp
-      - php-json
-      - php-ldap
-      - php-sqlite3
-      - php-xmlrpc
-      - php-xml
-      - php-geoip
-      - php-imap
-      - php-intl
-      - php-mysql
-      - php-soap
-      - php-mbstring
-  when: php_hell == "72" or php_hell == "73"
+- name: php_fpm_socket
+  set_fact:
+    php_fpm_socket: "/run/php/{{ php_fpm_poolname }}.sock"
+  when: not php_fpm_socket is defined
 
 - name: APT | Installation
   apt:
     name: "{{ php_packages }}"
   when: ansible_pkg_mgr == "apt" 
 
-- name: Fact | fpm configuration directory
-  set_fact: "{{item.key}}={{item.value}}"
-  with_items:
-    - key: fpm_poold
-      value: /etc/php/7.0/fpm/pool.d
-    - key: fpm_confd
-      value: /etc/php/7.0/fpm/conf.d
-    - key: php_modules_d
-      value: /etc/php/7.0/mods-available
-  when: php_hell == "70"
-
-- name: Fact | fpm configuration directory
-  set_fact: "{{item.key}}={{item.value}}"
-  with_items:
-    - key: fpm_poold
-      value: /etc/php/7.2/fpm/pool.d
-    - key: fpm_confd
-      value: /etc/php/7.2/fpm/conf.d
-    - key: php_modules_d
-      value: /etc/php/7.2/mods-available
-  when: php_hell == "72"
-
-- name: Fact | fpm configuration directory
-  set_fact: "{{item.key}}={{item.value}}"
-  with_items:
-    - key: fpm_poold
-      value: /etc/php/7.3/fpm/pool.d
-    - key: fpm_confd
-      value: /etc/php/7.3/fpm/conf.d
-    - key: php_modules_d
-      value: /etc/php/7.3/mods-available
-  when: php_hell == "73"
-
 - name: Activate php modules
   file:
     state: link
-    path: "{{fpm_confd}}/20-{{item }}"
-    src: "{{php_modules_d}}/{{ item }}"
-  with_items:
-    - mcrypt.ini
-  when: php_hell == "70"
+    path: "{{fpm_confd}}/{{item.name }}"
+    src: "{{php_modules_d}}/{{ item.src }}"
+  with_items: "{{ php_enmod }}"
+  when: php_enmod is defined
   notify: restart fpm
-
-- name: Fact | Detect fpm port
-  detect_fpm_port:
-    php_poold: "{{ fpm_poold }}"
-    pool_name: "{{ vhost_domain }}"
-  register: pool_info
-
-- name: Fact | FPM port
-  set_fact:
-    php_fpm_port: "{{ pool_info.port }}"
 
 - name: FPM Configuration
   template:

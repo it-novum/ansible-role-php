@@ -1,0 +1,100 @@
+- name: PHP facts for xenial
+  set_fact:
+    php_packages:
+      - php7.0-fpm
+      - php7.0-curl
+      - php7.0-gd
+      - php7.0-gmp
+      - php7.0-json
+      - php7.0-ldap
+      - php7.0-sqlite3
+      - php7.0-xmlrpc
+      - php7.0-xsl
+      - php-geoip
+      - php7.0-imap
+      - php7.0-intl
+      - php7.0-mcrypt
+      - php7.0-mysqlnd  
+      - php7.0-soap
+      - php7.0-mbstring
+    fpm_poold: /etc/php/7.0/fpm/pool.d
+    fpm_confd: /etc/php/7.0/fpm/conf.d
+    php_modules_d: /etc/php/7.0/mods-available
+    php_fpm_service: php7.0-fpm
+    php_enmod:
+      - name: 20-mcrypt.ini
+        src: mcrypt.ini
+  when: ansible_distribution_release == "xenial"
+
+- name: PHP facts for stretch
+  set_fact:
+    php_packages:
+      - php7.0-fpm
+      - php7.0-curl
+      - php7.0-gd
+      - php7.0-gmp
+      - php7.0-json
+      - php7.0-ldap
+      - php7.0-sqlite3
+      - php7.0-xmlrpc
+      - php7.0-xsl
+      - php-geoip
+      - php7.0-imap
+      - php7.0-intl
+      - php7.0-mcrypt
+      - php7.0-mysqlnd  
+      - php7.0-soap
+      - php7.0-mbstring
+    fpm_poold: /etc/php/7.0/fpm/pool.d
+    fpm_confd: /etc/php/7.0/fpm/conf.d
+    php_modules_d: /etc/php/7.0/mods-available
+    php_fpm_service: php7.0-fpm
+  when: ansible_distribution_release == "stretch"
+
+- name: PHP facts for bionic
+  set_fact:
+    php_packages:
+      - php-fpm
+      - php-curl
+      - php-gd
+      - php-gmp
+      - php-json
+      - php-ldap
+      - php-sqlite3
+      - php-xmlrpc
+      - php-xml
+      - php-geoip
+      - php-imap
+      - php-intl
+      - php-mysql
+      - php-soap
+      - php-mbstring
+    fpm_poold: /etc/php/7.2/fpm/pool.d
+    fpm_confd: /etc/php/7.2/fpm/conf.d
+    php_modules_d: /etc/php/7.2/mods-available
+    php_fpm_service: php7.2-fpm
+  when: ansible_distribution_release == "bionic"
+
+- name: PHP facts for buster
+  set_fact:
+    php_packages:
+      - php-fpm
+      - php-curl
+      - php-gd
+      - php-gmp
+      - php-json
+      - php-ldap
+      - php-sqlite3
+      - php-xmlrpc
+      - php-xml
+      - php-geoip
+      - php-imap
+      - php-intl
+      - php-mysql
+      - php-soap
+      - php-mbstring
+    fpm_poold: /etc/php/7.3/fpm/pool.d
+    fpm_confd: /etc/php/7.3/fpm/conf.d
+    php_modules_d: /etc/php/7.3/mods-available
+    php_fpm_service: php7.3-fpm
+  when: ansible_distribution_release == "buster"
