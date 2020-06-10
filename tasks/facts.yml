@@ -75,6 +75,30 @@
     php_fpm_service: php7.2-fpm
   when: ansible_distribution_release == "bionic"
 
+- name: PHP facts for focal
+  set_fact:
+    php_packages:
+      - php-fpm
+      - php-curl
+      - php-gd
+      - php-gmp
+      - php-json
+      - php-ldap
+      - php-sqlite3
+      - php-xmlrpc
+      - php-xml
+      - php-geoip
+      - php-imap
+      - php-intl
+      - php-mysql
+      - php-soap
+      - php-mbstring
+    fpm_poold: /etc/php/7.4/fpm/pool.d
+    fpm_confd: /etc/php/7.4/fpm/conf.d
+    php_modules_d: /etc/php/7.4/mods-available
+    php_fpm_service: php7.4-fpm
+  when: ansible_distribution_release == "focal"
+
 - name: PHP facts for buster
   set_fact:
     php_packages:
